@@ -56,7 +56,7 @@ public class MessageController {
                                       @RequestBody Map<String, String> message) {
         Map<String, String> messageFromDb = getMessage(id);
         messageFromDb.put("text", message.get("text"));
-        return message;
+        return messageFromDb;
     }
 
     @DeleteMapping("{id}")
