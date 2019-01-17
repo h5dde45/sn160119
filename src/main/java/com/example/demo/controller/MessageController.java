@@ -1,67 +1,53 @@
 package com.example.demo.controller;
 
-import com.example.demo.exceptions.NotFoundException;
+import com.example.demo.domain.Message;
+import com.example.demo.domain.Vews;
+import com.example.demo.repo.MessageRepo;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("message")
 public class MessageController {
-    private int counter = 4;
-    private List<Map<String, String>> messages = new ArrayList<Map<String, String>>() {{
-        add(new HashMap<String, String>() {{
-            put("id", "1");
-            put("text", "text_1");
-        }});
-        add(new HashMap<String, String>() {{
-            put("id", "2");
-            put("text", "text_2");
-        }});
-        add(new HashMap<String, String>() {{
-            put("id", "3");
-            put("text", "text_3");
-        }});
-    }};
+    private final MessageRepo messageRepo;
 
-    @GetMapping
-    public List<Map<String, String>> list() {
-        return messages;
+    @Autowired
+    public MessageController(MessageRepo messageRepo) {
+        this.messageRepo = messageRepo;
     }
 
-    private Map<String, String> getMessage(@PathVariable String id) {
-        return messages.stream()
-                .filter(message -> message.get("id").equals(id))
-                .findFirst()
-                .orElseThrow(NotFoundException::new);
+    @GetMapping
+    @JsonView(Vews.IdName.class)
+    public List<Message> list() {
+        return messageRepo.findAll();
     }
 
     @GetMapping("{id}")
-    public Map<String, String> getOne(@PathVariable String id) {
-        return getMessage(id);
-    }
-
-    @PostMapping()
-    public Map<String, String> create(@RequestBody Map<String, String> message) {
-        message.put("id", String.valueOf(counter++));
-        messages.add(message);
+    @JsonView(Vews.FullMessage.class)
+    public Message getOne(@PathVariable("id") Message message) {
         return message;
     }
 
+    @PostMapping()
+    public Message create(@RequestBody Message message) {
+        message.setCreationDate(LocalDateTime.now());
+        return messageRepo.save(message);
+    }
+
     @PutMapping("{id}")
-    public Map<String, String> update(@PathVariable String id,
-                                      @RequestBody Map<String, String> message) {
-        Map<String, String> messageFromDb = getMessage(id);
-        messageFromDb.put("text", message.get("text"));
-        return messageFromDb;
+    public Message update(@PathVariable("id") Message messageFromDb,
+                          @RequestBody Message message) {
+        BeanUtils.copyProperties(message, messageFromDb, "id");
+        return messageRepo.save(messageFromDb);
     }
 
     @DeleteMapping("{id}")
-    public void delete(@PathVariable String id) {
-        Map<String, String> messageFromDb = getMessage(id);
-        messages.remove(messageFromDb);
+    public void delete(@PathVariable("id") Message message) {
+        messageRepo.delete(message);
     }
 }
