@@ -86,7 +86,7 @@ Vue.component('messages-list', {
             message: null
         }
     },
-    template: `<div style="position: relative; width: 200px;">
+    template: `<div style="position: relative; width: 300px;">
     <message-form :messages="messages" :messageAttr="message"></message-form>
     <message-row v-for="message in messages"
     :key="message.id"
@@ -100,17 +100,23 @@ Vue.component('messages-list', {
 
 var app = new Vue({
     el: '#app',
-    template: '<messages-list :messages="messages"/>',
+    template: `<div>
+    <div v-if="!profile">Авторизация через <a href="/login">Google</a></div>
+    <div  v-else>
+    <div>{{profile.name}}&nbsp;<a href="/logout">Выйти</a></div>
+    <messages-list :messages="messages"/></div>
+    </div>`,
     data: {
-        messages: []
+        messages: frontendData.messages,
+        profile: frontendData.profile
     },
     created(){
-        messageApi.get()
-            .then(result =>
-                result.json()
-                    .then(data =>
-                        data.forEach(message => this.messages.push(message))
-                    )
-            )
+        // messageApi.get()
+        //     .then(result =>
+        //         result.json()
+        //             .then(data =>
+        //                 data.forEach(message => this.messages.push(message))
+        //             )
+        //     )
     }
 })
