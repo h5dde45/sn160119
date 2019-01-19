@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonView(Vews.Id.class)
+    @JsonView(Views.Id.class)
     private Long id;
-    @JsonView(Vews.IdName.class)
+    @JsonView(Views.IdName.class)
     private String text;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,
             pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(updatable = false)
-    @JsonView(Vews.FullMessage.class)
+    @JsonView(Views.FullMessage.class)
     private LocalDateTime creationDate;
 
     public Long getId() {
