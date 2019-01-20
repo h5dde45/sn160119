@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import java.util.function.BiConsumer;
 
 @Component
-public class WsSender {
-    private final SimpMessagingTemplate template;
-    private final ObjectMapper mapper;
+public class WsSender { //отправка объектов
+    private final SimpMessagingTemplate template; //отправка сообщений через очередь сообщений
+    private final ObjectMapper mapper; // (де)сериализует объекты
 
     @Autowired
     public WsSender(SimpMessagingTemplate template, ObjectMapper mapper) {
